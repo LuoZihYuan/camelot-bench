@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from ..roles import Role
+from ..engine.roles import Role
 
 
 class SeatGuess(BaseModel):

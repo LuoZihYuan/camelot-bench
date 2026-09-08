@@ -1,8 +1,8 @@
 """Deterministic 5-10 player Avalon engine with all special characters."""
 
 from .engine import AvalonGame, play_game
-from .records import GameRecord
-from .roles import (
+from .engine.records import GameRecord
+from .engine.roles import (
   Alignment,
   GameConfig,
   Knowledge,
@@ -10,7 +10,7 @@ from .roles import (
   barebones_config,
   recommended_config,
 )
-from .player import Decision, Player, RandomBot, Seat, Utterance, Vote
+from .engine.player import Decision, Player, RandomBot, Seat, Utterance, Vote
 
 __all__ = [
   "AvalonGame",

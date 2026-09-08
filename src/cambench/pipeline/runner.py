@@ -7,7 +7,7 @@ import pathlib
 from ..agents import LLMPlayer
 from ..agents.memory import Memory
 from ..config import settings
-from ..labels import seat_label
+from ..engine.labels import seat_label
 from ..llm import LLMClient
 from .loop_graph import build_pipeline
 from .store import RunStore, new_run_id

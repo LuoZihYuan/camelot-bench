@@ -9,10 +9,10 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import START, END, StateGraph
 
 from ..engine import AvalonGame
-from ..records import LiveStream
+from ..engine.records import LiveStream
 from ..agents.prompts import GAME_SEPARATOR
-from ..labels import seat_label
-from ..roles import alignment_of
+from ..engine.labels import seat_label
+from ..engine.roles import alignment_of
 
 
 class PipelineState(TypedDict, total=False):

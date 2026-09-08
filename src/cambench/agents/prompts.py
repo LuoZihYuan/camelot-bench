@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..labels import labels
+from ..engine.labels import labels
 
 
 # between-games wall in the recent-games window (chevrons, distinct from the

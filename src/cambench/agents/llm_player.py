@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import random
 
-from ..labels import label_to_seat
-from ..player import Decision, Player, Seat, Utterance, Vote
+from ..engine.labels import label_to_seat
+from ..engine.player import Decision, Player, Seat, Utterance, Vote
 from . import prompts, schemas
 from .decision_graph import build_decision_graph
 from .memory import Memory
