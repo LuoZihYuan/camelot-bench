@@ -29,14 +29,6 @@ def rolling_win_series(wins: list, window: int) -> list:
   return series
 
 
-def _reflection(record, seat: int) -> str:
-  """This seat's debrief reflection from the record (empty if none)."""
-  for ev in record.events:
-    if ev.type.value == "debrief" and seat in ev.private:
-      return ev.private[seat].get("reasoning", "")
-  return ""
-
-
 def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed_base=0, verbose=False):
   """Compile the between-games graph.
 
@@ -65,13 +57,23 @@ def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed
     rec = game.record
     winner = rec.outcome["winner"]
 
-    # per-seat learning (atomic freeze: skip the whole update for frozen seats)
+    # per-seat learning (atomic freeze: skip the whole update for frozen seats).
+    # run_debrief already added each seat's reflection to the record, so
+    # rec.render(seat) includes it. Order: record result -> recompute win-rate
+    # (so it includes THIS game) -> revise notes (sees fresh trajectory +
+    # reflection) -> store window + curated.
     for seat, p in enumerate(players):
+      if not roster[seat].get("learn", True):
+        continue
       role = game.assignment[seat]
       side = alignment_of(role).value
       result = {"won": side == winner, "role": role.value, "side": side}
-      if roster[seat].get("learn", True):
-        p.memory.update(rec.render(seat), _reflection(rec, seat), result)
+      log_with_reflection = rec.render(seat)
+
+      p.memory.record_result(result)
+      p.win_rate_series = rolling_win_series(p.memory.wins(), win_rate_window)
+      new_notes = p.revise_notes(log_with_reflection, game._ctx(seat))
+      p.memory.update_after_revise(log_with_reflection, new_notes)
 
     # global, unconditional persistence
     store.save_record(idx, rec)

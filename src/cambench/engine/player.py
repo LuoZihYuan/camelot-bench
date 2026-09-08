@@ -94,6 +94,10 @@ class Player(ABC):
     """Post-game private reflection, after the reveal. Default: none."""
     return ""
 
+  def revise_notes(self, log: str, ctx: Seat) -> str:
+    """Revise standing cross-game notes (log includes this game's reflection). Default: none."""
+    return ""
+
 
 class RandomBot(Player):
   """Legal, seedable random player for exercising the engine. No strategy."""

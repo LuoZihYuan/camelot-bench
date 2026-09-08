@@ -236,8 +236,9 @@ def format_event(ev, viewer, state: dict, include_beliefs: bool = True) -> list:
     lines.append(_div(f"DISCUSS {state['attempt']}", "\u00b7"))
 
   elif t == "speak":
-    if e.get("statement"):
-      line = f"[{e['seat']}] {e['statement']}"
+    stmt = e.get("statement", "")
+    if stmt:
+      line = f"[{e['seat']}] {stmt}"
       if e.get("next"):
         line += f" {e['next']}, you're next."
       lines.append(line)

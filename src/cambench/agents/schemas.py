@@ -57,6 +57,12 @@ class AssassinateDecision(BaseModel):
 
 
 class DebriefOutput(BaseModel):
-  """Post-game reflection carried into future games."""
+  """Reflection on the game just played (becomes part of that game's log)."""
 
-  reflection: str = Field(description="(private) Notes to carry into your future games.")
+  reflection: str = Field(description="(private) Your reflection on the game just played.")
+
+
+class NotesUpdate(BaseModel):
+  """Revised standing notes carried across all future games."""
+
+  notes: str = Field(description="(private) Your complete, revised notes to carry into future games.")

@@ -34,8 +34,9 @@ The game runs up to 5 Quests. For each Quest:
 ### Discussion
 Before each vote, players speak in a chain: the leader (proposer) speaks first,
 and each speaker names who speaks next (you cannot nominate yourself). You may
-speak only a limited number of times per proposal; once your turns are used you
-cannot speak again on that proposal.
+speak at most {turns} times per proposal; once your turns are used you cannot
+speak again on that proposal. You may skip your turn by saying "skip" -- this
+still uses the turn and you still name who speaks next.
 
 ## Winning
   - Good completes 3 Quests -> Good is winning, but the Assassin then names one
@@ -62,9 +63,10 @@ Only some are in play each game; you are told which, and which you are.
 # You
 
 ## Objective
-You play many games. Your aim is to win as many as you can. Between games you
-keep private notes and can see your win-rate trajectory; use them to learn and
-adapt. How to play well is for you to work out.
+You play many games. Your aim is to win as many as you can. You keep a single set
+of private notes that persists across every game; after each game you revise them
+with what you learned. You can also see your win-rate trajectory. Use both to
+learn and adapt. How to play well is for you to work out.
 
 ## Visibility
 Each of your outputs is tagged with one of these:
@@ -88,7 +90,10 @@ def build_system_prompt(
   win_rate_series: list | None = None,
 ) -> str:
   """Everything fixed for the whole game, ordered general -> specific."""
-  parts = [RULES, format_win_rate(win_rate_series or [])]
+  from ..engine.roles import TURNS_PER_SEAT
+
+  rules = RULES.replace("{turns}", str(TURNS_PER_SEAT))
+  parts = [rules, format_win_rate(win_rate_series or [])]
   if notes.strip():
     parts.append("## Notes\nCarried from your past games.\n\n" + notes.strip())
   if recent_games:
@@ -117,7 +122,7 @@ def ask_propose(team_size: int) -> str:
 
 def ask_speak(can_nominate: list) -> str:
   elig = ", ".join(labels(can_nominate)) if can_nominate else "(none)"
-  return f"Speak to the table, then name who speaks next. You may nominate: {elig}."
+  return f'Speak to the table (or say "skip" to pass this turn), then name who speaks next. You may nominate: {elig}.'
 
 
 def ask_vote(proposed_team) -> str:
@@ -135,4 +140,14 @@ def ask_assassinate() -> str:
 
 
 def ask_debrief() -> str:
-  return "The game is over and all roles are revealed. Record notes to carry into your future games."
+  return (
+    "The game is over and all roles are revealed. Reflect on what you can learn from it. Storage is limited, so be concise."
+  )
+
+
+def ask_revise_notes() -> str:
+  return (
+    "Now revise your Notes -- the single set you carry into every future game, "
+    "to help you win more over time. Your output replaces your notes entirely, "
+    "so output the full updated notes. Storage is limited, so be concise."
+  )

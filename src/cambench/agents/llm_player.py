@@ -129,3 +129,12 @@ class LLMPlayer(Player):
       return ""
 
     return self._decide(log, prompts.ask_debrief(), schemas.DebriefOutput, validate, fallback)
+
+  def revise_notes(self, log: str, ctx: Seat) -> str:
+    def validate(raw):
+      return (True, raw.notes)
+
+    def fallback():
+      return self.memory.curated  # keep existing notes if revision fails
+
+    return self._decide(log, prompts.ask_revise_notes(), schemas.NotesUpdate, validate, fallback)

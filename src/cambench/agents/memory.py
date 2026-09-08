@@ -18,14 +18,12 @@ class Memory:
   window_size: int = DEFAULT_WINDOW
   notes_chars: int = DEFAULT_NOTES_CHARS
 
-  def update(self, game_log: str, new_curated: str, result: dict | None = None) -> None:
-    """After a learning game: append its log to the window (FIFO), rewrite notes, record result."""
+  def update_after_revise(self, game_log: str, new_curated: str) -> None:
+    """Store window + revised notes; the result was recorded earlier (before revision)."""
     self.window.append(game_log)
     if len(self.window) > self.window_size:
       self.window = self.window[-self.window_size :]
     self.curated = new_curated.strip()[: self.notes_chars]
-    if result is not None:
-      self.results.append(result)  # e.g. {"won": True, "role": "merlin", "side": "good"}
 
   def record_result(self, result: dict) -> None:
     """Record a game outcome even when memory isn't otherwise updated (e.g. frozen)."""
