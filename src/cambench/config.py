@@ -19,6 +19,7 @@ class Settings(BaseSettings):
   default_model: str = "gpt-4o-mini"  # bare OpenAI model name (Responses API)
   reasoning_effort: str = ""  # "" = off; set low/medium/high for reasoning models
   retries: int = 3
+  win_rate_window: int = 10  # rolling window for the win-rate trajectory shown to agents
 
   def export_keys(self) -> None:
     """Push loaded keys into os.environ so Pydantic AI providers find them."""

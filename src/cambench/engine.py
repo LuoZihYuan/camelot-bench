@@ -28,6 +28,7 @@ class AvalonGame:
     config: GameConfig | None = None,
     game_id: str = "game",
     seed: int | None = None,
+    on_event: object = None,
   ):
     n = len(players)
     self.config = config or barebones_config(n)
@@ -52,6 +53,7 @@ class AvalonGame:
       num_players=n,
       assignment=dict(self.assignment),
       initial_knowledge=dict(self.knowledge),
+      on_event=on_event,
     )
 
     # running public state
