@@ -10,19 +10,30 @@ DEFAULT_NOTES_CHARS = 4000  # soft cap on curated-notes length (safety net)
 
 @dataclass
 class Memory:
-  """Combine memory: rewritable curated notes + a FIFO window of recent game logs."""
+  """Combine memory: rewritable curated notes + a FIFO window of recent game logs + own results."""
 
   curated: str = ""
   window: list = field(default_factory=list)
+  results: list = field(default_factory=list)  # this agent's own per-game outcomes
   window_size: int = DEFAULT_WINDOW
   notes_chars: int = DEFAULT_NOTES_CHARS
 
-  def update(self, game_log: str, new_curated: str) -> None:
-    """After a learning game: append its log to the window (FIFO), rewrite notes."""
+  def update(self, game_log: str, new_curated: str, result: dict | None = None) -> None:
+    """After a learning game: append its log to the window (FIFO), rewrite notes, record result."""
     self.window.append(game_log)
     if len(self.window) > self.window_size:
       self.window = self.window[-self.window_size :]
     self.curated = new_curated.strip()[: self.notes_chars]
+    if result is not None:
+      self.results.append(result)  # e.g. {"won": True, "role": "merlin", "side": "good"}
+
+  def record_result(self, result: dict) -> None:
+    """Record a game outcome even when memory isn't otherwise updated (e.g. frozen)."""
+    self.results.append(result)
+
+  def wins(self) -> list:
+    """This agent's per-game win/lose booleans, oldest to newest."""
+    return [bool(r.get("won")) for r in self.results]
 
   def recent_games(self) -> list:
     """The sliding window, oldest to newest."""
@@ -32,6 +43,7 @@ class Memory:
     return {
       "curated": self.curated,
       "window": list(self.window),
+      "results": list(self.results),
       "window_size": self.window_size,
       "notes_chars": self.notes_chars,
     }
@@ -41,6 +53,7 @@ class Memory:
     return cls(
       curated=d.get("curated", ""),
       window=list(d.get("window", [])),
+      results=list(d.get("results", [])),
       window_size=d.get("window_size", DEFAULT_WINDOW),
       notes_chars=d.get("notes_chars", DEFAULT_NOTES_CHARS),
     )
