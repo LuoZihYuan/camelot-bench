@@ -14,7 +14,7 @@ def main():
   ap.add_argument("--model", default=settings.default_model)
   ap.add_argument("--players", type=int, default=5)
   ap.add_argument("--games", type=int, default=10)
-  ap.add_argument("--label", default="train")
+  ap.add_argument("--label", default="")
   ap.add_argument("--verbose", action="store_true", help="print each game's full log")
   args = ap.parse_args()
 

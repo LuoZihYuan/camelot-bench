@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 import pathlib
-from datetime import datetime, timezone
+from datetime import datetime
 
 
 def new_run_id(label: str = "") -> str:
-  """A sortable timestamp id, optionally suffixed with a label."""
-  ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+  """A sortable local-time id (with UTC offset), optionally suffixed with a label."""
+  ts = datetime.now().astimezone().strftime("%y%m%d%H%M%S%z")
   return f"{ts}_{label}" if label else ts
 
 
@@ -30,9 +30,9 @@ class RunStore:
     return str(self.checkpoints_dir / "run.sqlite")
 
   def save_record(self, index: int, record) -> None:
-    """Write one game's full transcript to records/game_NNNN.json."""
-    path = self.records_dir / f"game_{index:04d}.json"
-    path.write_text(record.to_json(indent=2))
+    """Write one game's full transcript to records/game_NNNN.jsonl (event per line)."""
+    path = self.records_dir / f"game_{index:04d}.jsonl"
+    path.write_text(record.to_jsonl())
 
   def append_result(self, row: dict) -> None:
     """Append one game's outcome to the results ledger (crash-safe, one line)."""

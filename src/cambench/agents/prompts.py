@@ -35,7 +35,7 @@ The game runs up to 5 Quests. For each Quest:
 Before each vote, players speak in a chain: the leader (proposer) speaks first,
 and each speaker names who speaks next (you cannot nominate yourself). You may
 speak at most {turns} times per proposal; once your turns are used you cannot
-speak again on that proposal. You may skip your turn by saying "skip" -- this
+speak again on that proposal. You may skip your turn by saying "Skip." -- this
 still uses the turn and you still name who speaks next.
 
 ## Winning

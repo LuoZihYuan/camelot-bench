@@ -105,10 +105,11 @@ class GameRecord:
 
   # --- serialization ---
 
-  def to_dict(self) -> dict:
+  def _summary(self) -> dict:
+    """Merged header + outcome; always the first JSONL line, so it carries no type."""
     from .labels import labels, seat_label
 
-    return {
+    summary = {
       "game_id": self.game_id,
       "num_players": self.num_players,
       "assignment": {seat_label(s): r.value for s, r in self.assignment.items()},
@@ -119,20 +120,28 @@ class GameRecord:
         }
         for s, k in self.initial_knowledge.items()
       },
-      "events": [
-        {
-          "type": ev.type.value,
-          "payload": ev.payload,
-          "visible_to": (ALL if ev.visible_to == ALL else labels(sorted(ev.visible_to))),
-          "private": {seat_label(s): p for s, p in ev.private.items()},
-        }
-        for ev in self.events
-      ],
-      "outcome": self.outcome,
     }
+    # fold in the outcome, minus its redundant role map (already in assignment)
+    summary.update({k: v for k, v in self.outcome.items() if k != "roles"})
+    return summary
 
-  def to_json(self, indent: int | None = None) -> str:
-    return json.dumps(self.to_dict(), indent=indent)
+  def to_jsonl(self) -> str:
+    """First line = merged game summary (no type); each following line = one event."""
+    from .labels import labels, seat_label
+
+    lines = [json.dumps(self._summary())]
+    for ev in self.events:
+      lines.append(
+        json.dumps(
+          {
+            "type": ev.type.value,
+            "payload": ev.payload,
+            "visible_to": ALL if ev.visible_to == ALL else labels(sorted(ev.visible_to)),
+            "private": {seat_label(s): p for s, p in ev.private.items()},
+          }
+        )
+      )
+    return "\n".join(lines)
 
 
 # --- shared per-event formatting (used by render() batch and LiveStream live) ---
@@ -298,3 +307,11 @@ class LiveStream:
     lines = format_event(ev, "god", self._state, self._beliefs)
     if lines:
       self._print("\n".join(lines), flush=True)
+
+
+def read_jsonl(text: str) -> dict:
+  """Parse a JSONL record: first line = summary, following lines = events."""
+  lines = [ln for ln in text.splitlines() if ln.strip()]
+  summary = json.loads(lines[0]) if lines else {}
+  events = [json.loads(ln) for ln in lines[1:]]
+  return {**summary, "events": events}
