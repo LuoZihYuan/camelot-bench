@@ -1,4 +1,4 @@
-"""Typed settings loaded from environment / .env via pydantic-settings."""
+"""Typed settings and all default values, loaded from environment / .env via pydantic-settings."""
 
 from __future__ import annotations
 
@@ -15,11 +15,13 @@ class Settings(BaseSettings):
   anthropic_api_key: str = ""
   google_api_key: str = ""
 
-  # defaults
-  default_model: str = "gpt-4o-mini"  # bare OpenAI model name (Responses API)
-  reasoning_effort: str = ""  # "" = off; set low/medium/high for reasoning models
-  retries: int = 3
-  win_rate_window: int = 10  # rolling window for the win-rate trajectory shown to agents
+  # the single source of every default (behavioural + invocation)
+  default_model: str = "openai:gpt-4o-mini"  # provider-prefixed
+  default_reasoning_effort: str = ""  # "" = off; low/medium/high for reasoning models
+  default_games: int = 10
+  default_players: int = 5
+  win_rate_window: int = 10  # rolling window for the win-rate trajectory
+  memory_window: int = 3  # recent games kept in the memory window
 
   def export_keys(self) -> None:
     """Push loaded keys into os.environ so Pydantic AI providers find them."""

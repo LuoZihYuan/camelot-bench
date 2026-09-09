@@ -17,7 +17,7 @@ class SeatGuess(BaseModel):
 class ProposeDecision(BaseModel):
   """Leader's team proposal."""
 
-  reasoning: str = Field(description="(private) Your reasoning for this team.")
+  reasoning: str = Field(description="(private) Your concise reasoning for this team.")
   team: list[str] = Field(
     description="(public) Seat letters on the team, e.g. ['A', 'C']. Exactly the "
     "required team size, all distinct. You may include yourself."
@@ -27,7 +27,7 @@ class ProposeDecision(BaseModel):
 class SpeakDecision(BaseModel):
   """One discussion turn: what you say, and who speaks next."""
 
-  reasoning: str = Field(description="(private) Your reasoning.")
+  reasoning: str = Field(description="(private) Your concise reasoning.")
   statement: str = Field(description="(public) What you say aloud to the table.")
   next_speaker: str = Field(description="(public) Seat letter of who speaks next. Must be an eligible seat, not yourself.")
 
@@ -35,7 +35,7 @@ class SpeakDecision(BaseModel):
 class VoteDecision(BaseModel):
   """A vote on the proposed team, with your current read of the table."""
 
-  reasoning: str = Field(description="(private) Your reasoning.")
+  reasoning: str = Field(description="(private) Your concise reasoning.")
   belief: list[SeatGuess] = Field(
     description="(private) Your current best guess of the role of each seat you don't already know. One entry per unknown seat."
   )
@@ -45,24 +45,24 @@ class VoteDecision(BaseModel):
 class QuestDecision(BaseModel):
   """A quest card played on a mission."""
 
-  reasoning: str = Field(description="(private) Your reasoning.")
+  reasoning: str = Field(description="(private) Your concise reasoning.")
   success: bool = Field(description="(secret) True to make the mission succeed, False to make it fail.")
 
 
 class AssassinateDecision(BaseModel):
   """The assassin's end-game guess at Merlin."""
 
-  reasoning: str = Field(description="(private) Your reasoning.")
+  reasoning: str = Field(description="(private) Your concise reasoning.")
   target: str = Field(description="(public) Seat letter of the player you believe is Merlin.")
 
 
 class DebriefOutput(BaseModel):
   """Reflection on the game just played (becomes part of that game's log)."""
 
-  reflection: str = Field(description="(private) Your reflection on the game just played.")
+  reflection: str = Field(description="(private) Your concise reflection on the game just played.")
 
 
 class NotesUpdate(BaseModel):
   """Revised standing notes carried across all future games."""
 
-  notes: str = Field(description="(private) Your complete, revised notes to carry into future games.")
+  notes: str = Field(description="(private) Your concise revised notes; replaces your previous notes.")

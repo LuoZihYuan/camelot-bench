@@ -1,6 +1,8 @@
 # Project ------------------------------------------------
 data/*
 !data/.gitkeep
+roster.yaml
+!roster.example.yaml
 
 # Python -------------------------------------------------
 __pycache__/

@@ -73,7 +73,10 @@ Each of your outputs is tagged with one of these:
   - **public**: every player sees it.
   - **private**: only you ever see it.
   - **secret**: your individual choice is hidden from everyone; only an aggregate
-    (e.g. the number of Fail cards) is revealed."""
+    (e.g. the number of Fail cards) is revealed.
+
+## Style
+Everything you write is kept in limited space, so be concise."""
 
 
 def format_win_rate(series: list) -> str:
@@ -122,7 +125,7 @@ def ask_propose(team_size: int) -> str:
 
 def ask_speak(can_nominate: list) -> str:
   elig = ", ".join(labels(can_nominate)) if can_nominate else "(none)"
-  return f'Speak to the table (or say "skip" to pass this turn), then name who speaks next. You may nominate: {elig}.'
+  return f'Speak to the table (or say "Skip." to pass this turn), then name who speaks next. You may nominate: {elig}.'
 
 
 def ask_vote(proposed_team) -> str:
@@ -148,6 +151,6 @@ def ask_debrief() -> str:
 def ask_revise_notes() -> str:
   return (
     "Now revise your Notes -- the single set you carry into every future game, "
-    "to help you win more over time. Your output replaces your notes entirely, "
-    "so output the full updated notes. Storage is limited, so be concise."
+    "to help you win more over time. Your output replaces your notes entirely. "
+    "Storage is limited, so be concise."
   )

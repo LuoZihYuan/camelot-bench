@@ -1,0 +1,42 @@
+# Example roster. Copy to roster.yaml (gitignored) and edit, or point --config at any file:
+#   uv run python scripts/train.py --config roster.yaml
+#
+# Omitted fields fall back to .env / built-in defaults. API keys live in .env, never here.
+# Precedence for any value: CLI flag > this file > .env > code default.
+
+games: 20                 # how many games this run plays
+# label: luna-vs-4omini   # optional suffix on the run folder name
+# win_rate_window: 10     # rolling window for the win-rate trajectory shown to agents
+# memory_window: 3        # recent games kept in each agent's memory window
+
+# One entry per seat; seat count = number of entries (5-10).
+# Per-seat fields:
+#   model            provider-prefixed: openai: / anthropic: / google:
+#   reasoning_effort low | medium | high  (omit/blank = off; a hint, ignored if unsupported)
+#   memory           path to a saved memory .json to load  (omit = start blank)
+#   learn            true (default) = memory updates; false = frozen
+seats:
+  - {model: openai:gpt-4o-mini}                                  # minimal: just a model
+  - {model: anthropic:claude-sonnet-4-5, reasoning_effort: medium}  # a reasoning model
+  - {model: google:gemini-2.5-flash}                            # a different provider
+  - {model: openai:gpt-4o-mini, memory: data/runs/<prev>/memory/A.json}  # warm-started
+  - {model: openai:gpt-4o-mini, memory: data/runs/<prev>/memory/B.json, learn: false}  # frozen eval agent
+
+# --- other common shapes (uncomment a block to use) ---
+#
+# All identical (homogeneous self-play) -- or just use the CLI:
+#   uv run python scripts/train.py --model openai:gpt-4o-mini --players 5 --games 20
+# seats:
+#   - {model: openai:gpt-4o-mini}
+#   - {model: openai:gpt-4o-mini}
+#   - {model: openai:gpt-4o-mini}
+#   - {model: openai:gpt-4o-mini}
+#   - {model: openai:gpt-4o-mini}
+#
+# Frozen baseline eval: one trained agent under test vs. fresh opponents
+# seats:
+#   - {model: openai:gpt-4o-mini, memory: data/runs/<prev>/memory/A.json, learn: false}  # under test
+#   - {model: openai:gpt-4o-mini, learn: false}   # fresh, no-memory baseline
+#   - {model: openai:gpt-4o-mini, learn: false}
+#   - {model: openai:gpt-4o-mini, learn: false}
+#   - {model: openai:gpt-4o-mini, learn: false}
