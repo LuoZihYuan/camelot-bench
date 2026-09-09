@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import sqlite3
 from typing import TypedDict
 
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import START, END, StateGraph
 
 from ..engine import AvalonGame
@@ -16,7 +14,7 @@ from ..engine.roles import alignment_of
 
 
 class PipelineState(TypedDict, total=False):
-  index: int  # games completed (the only checkpointed control data)
+  index: int  # games completed so far
   target: int  # total games to play
 
 
@@ -32,11 +30,10 @@ def rolling_win_series(wins: list, window: int) -> list:
 def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed_base=0, verbose=False):
   """Compile the between-games graph.
 
-  Live objects (players, store, config) are captured in closures -- never in
-  graph state, which stays serializable (just index/target) for checkpointing.
-  Agent memory is persisted separately by the runner (memory/*.json), not the
-  checkpoint. `roster[seat]["learn"]` gates whether that seat's memory updates.
-  `verbose` also prints each finished game's full log.
+  Live objects (players, store, config) are captured in closures. State is just
+  {index, target}. Each learning seat's memory is saved to memory/*.json after
+  every game, so a stopped run can resume from the records + memory on disk.
+  `roster[seat]["learn"]` gates whether that seat's memory updates.
   """
   n = len(players)
   roster = roster or [{"learn": True} for _ in range(n)]
@@ -86,6 +83,9 @@ def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed
         "seat_to_model": {seat_label(i): p.name for i, p in enumerate(players)},
       }
     )
+    # per-game memory save -> resume point survives an interruption
+    for seat, p in enumerate(players):
+      store.save_memory(seat_label(seat), p.memory.to_dict())
 
     # live output
     if verbose:
@@ -103,6 +103,4 @@ def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed
   g.add_edge(START, "setup")
   g.add_edge("setup", "game")
   g.add_conditional_edges("game", route, {"loop": "setup", "done": END})
-
-  conn = sqlite3.connect(store.checkpoint_db(), check_same_thread=False)
-  return g.compile(checkpointer=SqliteSaver(conn))
+  return g.compile()

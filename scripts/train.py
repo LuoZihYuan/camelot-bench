@@ -7,12 +7,20 @@ import argparse
 from cambench import recommended_config
 from cambench.config import settings
 from cambench.pipeline.roster import load_roster, resolve_seats, seat_field_present, homogeneous_seats
-from cambench.pipeline.runner import run
+from cambench.pipeline.runner import run, resume
+from cambench.pipeline.store import RunStore, latest_incomplete_run
 
 
 def main():
   ap = argparse.ArgumentParser()
   ap.add_argument("--config", help="YAML roster file (per-seat models etc.)")
+  ap.add_argument(
+    "--resume",
+    nargs="?",
+    const="",
+    default=None,
+    help="resume a run: --resume <run_id>, or bare --resume for the latest unfinished",
+  )
   ap.add_argument("--model", default=settings.default_model)
   ap.add_argument("--reasoning-effort", default=settings.default_reasoning_effort)
   ap.add_argument("--players", type=int, default=settings.default_players)
@@ -24,6 +32,15 @@ def main():
   ap.add_argument("--memory-window", type=int, default=settings.memory_window)
   ap.add_argument("--verbose", action="store_true", help="stream each game live (god view)")
   args = ap.parse_args()
+
+  # resume path: reconstruct everything from the saved run on disk
+  if args.resume is not None:
+    run_id = args.resume or latest_incomplete_run()
+    if not run_id:
+      ap.error("no unfinished run found to resume")
+    store = resume(run_id, recommended_config(_seat_count(run_id)), verbose=args.verbose)
+    _summary(store)
+    return
 
   flags = argv_flags()
   roster = load_roster(args.config) if args.config else {}
@@ -73,7 +90,14 @@ def main():
   store = run(
     seats, recommended_config(len(seats)), games=games, label=label, win_rate_window=wrw, memory_window=mw, verbose=args.verbose
   )
+  _summary(store)
 
+
+def _seat_count(run_id: str) -> int:
+  return len(RunStore(run_id).load_all_memory())
+
+
+def _summary(store) -> None:
   results = store.read_results()
   wins = sum(1 for r in results if r["winner"] == "good")
   print(f"run: {store.run_id}")
