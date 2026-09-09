@@ -211,7 +211,9 @@ def format_event(ev, viewer, state: dict, include_beliefs: bool = True) -> list:
     state["team_sizes"] = e["quest_team_sizes"]
     state["fails"] = e["fails_required"]
     lines.append(_div("START", "\u2500"))
-    lines.append(f"[GAME] {e['num_players']} players. Roles in play: {_roles_in_play(e['roles_in_play'])}.")
+    roster = ", ".join(seat_label(s) for s in range(e["num_players"]))
+    lines.append(f"[GAME] {e['num_players']} players: {roster}.")
+    lines.append(f"[GAME] Roles in play: {_roles_in_play(e['roles_in_play'])}.")
     if god:
       for seat, ov in sorted(ev.private.items()):
         extra = ""
@@ -227,8 +229,8 @@ def format_event(ev, viewer, state: dict, include_beliefs: bool = True) -> list:
       if e.get("merlin_candidates"):
         extra += f" Merlin is one of: {', '.join(e['merlin_candidates'])}."
       lines.append(
-        f"[GAME] (privately) You are {_role_name(e['your_role'])} — "
-        f"{e['your_alignment'].title()}, on seat {e['your_seat']}.{extra}"
+        f"[GAME] (privately) Your name is {e['your_seat']}. "
+        f"Your role is {_role_name(e['your_role'])} — {e['your_alignment'].title()}.{extra}"
       )
 
   elif t == "propose":

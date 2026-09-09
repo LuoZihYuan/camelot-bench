@@ -1,4 +1,4 @@
-"""Per-run persistence: manifest, records archive, results ledger, and portable agent memory."""
+"""Per-run persistence: results ledger (manifest on line 1), records archive, agent memory."""
 
 from __future__ import annotations
 
@@ -23,22 +23,21 @@ class RunStore:
     self.records_dir = self.dir / "records"
     self.memory_dir = self.dir / "memory"
     self.results_path = self.dir / "results.jsonl"
-    self.manifest_path = self.dir / "run.json"
     for d in (self.records_dir, self.memory_dir):
       d.mkdir(parents=True, exist_ok=True)
 
-  # --- manifest (run-level params + status) ---
+  # --- manifest = line 1 of results.jsonl (immutable: roster, seed, params) ---
 
   def write_manifest(self, manifest: dict) -> None:
-    self.manifest_path.write_text(json.dumps(manifest, indent=2))
+    """Write the run manifest as the first line; results append after it."""
+    self.results_path.write_text(json.dumps(manifest) + "\n")
 
   def read_manifest(self) -> dict:
-    return json.loads(self.manifest_path.read_text()) if self.manifest_path.exists() else {}
-
-  def set_status(self, status: str) -> None:
-    m = self.read_manifest()
-    m["status"] = status
-    self.write_manifest(m)
+    if not self.results_path.exists():
+      return {}
+    with self.results_path.open(encoding="utf-8") as f:
+      first = f.readline()
+    return json.loads(first) if first.strip() else {}
 
   # --- games ---
 
@@ -47,7 +46,7 @@ class RunStore:
     (self.records_dir / f"game_{index:04d}.jsonl").write_text(record.to_jsonl())
 
   def games_done(self) -> int:
-    """Count completed games = the durable resume point."""
+    """Count completed games = the durable resume point / completion check."""
     return len(list(self.records_dir.glob("game_*.jsonl")))
 
   def append_result(self, row: dict) -> None:
@@ -55,22 +54,22 @@ class RunStore:
       f.write(json.dumps(row) + "\n")
 
   def read_results(self) -> list:
+    """Per-game outcome rows (skips the manifest on line 1)."""
     if not self.results_path.exists():
       return []
     with self.results_path.open(encoding="utf-8") as f:
-      return [json.loads(line) for line in f if line.strip()]
+      lines = [ln for ln in f if ln.strip()]
+    return [json.loads(ln) for ln in lines[1:]]
 
-  # --- memory (per-seat, overwritten each game; also the resume roster source) ---
+  # --- memory (per-seat, named by the seat's display name; overwritten each game) ---
 
-  def save_memory(self, agent: str, memory_dict: dict) -> None:
-    (self.memory_dir / f"{agent}.json").write_text(json.dumps(memory_dict, indent=2))
+  def save_memory(self, name: str, memory_dict: dict) -> None:
+    (self.memory_dir / f"{name}.json").write_text(json.dumps(memory_dict, indent=2))
 
-  def load_all_memory(self) -> dict:
-    """All saved seat memories, keyed by seat letter (for resume)."""
-    out = {}
-    for p in sorted(self.memory_dir.glob("*.json")):
-      out[p.stem] = json.loads(p.read_text())
-    return out
+  def load_memory(self, name: str) -> dict | None:
+    """This seat's saved memory, or None if it hasn't been saved yet."""
+    p = self.memory_dir / f"{name}.json"
+    return json.loads(p.read_text()) if p.exists() else None
 
 
 def load_memory_file(path: str) -> dict:
@@ -79,13 +78,20 @@ def load_memory_file(path: str) -> dict:
 
 
 def latest_incomplete_run(root: str = "data/runs") -> str | None:
-  """The newest run whose manifest status is not 'complete' (for lazy --resume)."""
+  """The newest run whose completed games < target (for lazy --resume)."""
   base = pathlib.Path(root)
   if not base.exists():
     return None
-  runs = sorted((d for d in base.iterdir() if d.is_dir()), reverse=True)
-  for d in runs:
-    m = d / "run.json"
-    if m.exists() and json.loads(m.read_text()).get("status") != "complete":
+  for d in sorted((d for d in base.iterdir() if d.is_dir()), reverse=True):
+    results = d / "results.jsonl"
+    if not results.exists():
+      continue
+    with results.open(encoding="utf-8") as f:
+      first = f.readline()
+    if not first.strip():
+      continue
+    target = json.loads(first).get("target_games", 0)
+    done = len(list((d / "records").glob("game_*.jsonl")))
+    if done < target:
       return d.name
   return None

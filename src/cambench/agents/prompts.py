@@ -15,7 +15,7 @@ RULES = """\
 
 Avalon is a hidden-role game. Each player is secretly dealt a **role** (see
 Roles). Every role is either **Good** or **Evil**, and some grant special
-knowledge. Players are seated at labelled seats (A, B, C, ...). Good wins by
+knowledge. Each player has a short name (e.g. K83V). Good wins by
 completing Quests; Evil wins by sabotaging them or by assassinating Merlin.
 
 ## Flow

@@ -7,7 +7,7 @@ import random
 from ..agents import LLMPlayer
 from ..agents.memory import Memory
 from ..config import settings
-from ..engine.labels import seat_label
+from ..engine.labels import seat_label, make_names, set_names
 from ..llm import LLMClient
 from .loop_graph import build_pipeline
 from .store import RunStore, new_run_id, load_memory_file
@@ -62,49 +62,43 @@ def run(
       "win_rate_window": wrw,
       "memory_window": mw,
       "seed_base": seed_base,
-      "status": "running",
+      "seats": seats,
     }
   )
+  set_names(make_names(len(seats), seed_base))  # per-run seat identities (LDDL, from seed)
   players = build_players(seats, mw)
   return _drive(store, players, config, seats, games, wrw, seed_base, start_index=0, verbose=verbose)
 
 
 def resume(run_id: str, config, root: str = "data/runs", verbose: bool = False):
-  """Resume an interrupted run from its saved records + memory + manifest."""
+  """Resume an interrupted run from its manifest (roster) + saved memory + records."""
   store = RunStore(run_id, root=root)
   m = store.read_manifest()
   games = m["target_games"]
   wrw = m.get("win_rate_window", settings.win_rate_window)
+  mw = m.get("memory_window", settings.memory_window)
   seed_base = m.get("seed_base", 0)
+  seats = m["seats"]  # authoritative roster (ordered)
 
-  # rebuild each seat from its saved memory's provenance; reload that memory
-  saved = store.load_all_memory()
-  seats, players = [], []
-  for i, seat_label_ in enumerate(sorted(saved)):
-    d = saved[seat_label_]
-    prov = d.get("provenance", {})
-    seat = {
-      "model": prov.get("model") or settings.default_model,
-      "reasoning_effort": prov.get("reasoning_effort", ""),
-      "memory": prov.get("memory"),
-      "learn": prov.get("learn", True),
-    }
-    seats.append(seat)
-    mem = Memory.from_dict(d)
+  set_names(make_names(len(seats), seed_base))  # same names as the original run
+  names = [seat_label(i) for i in range(len(seats))]
+  players = []
+  for i, seat in enumerate(seats):
+    d = store.load_memory(names[i])  # this seat's saved memory, if any
+    mem = Memory.from_dict(d) if d else Memory(window_size=mw)
+    _stamp_provenance(mem, seat)
     players.append(_player_from_seat(i, seat, mem))
 
-  store.set_status("running")
   done = store.games_done()
   print(f"[cambench] resuming {run_id} at game {done + 1}/{games}", flush=True)
   return _drive(store, players, config, seats, games, wrw, seed_base, start_index=done, verbose=verbose)
 
 
 def _drive(store, players, config, seats, games, wrw, seed_base, start_index, verbose):
-  """Invoke the graph from start_index, then finalize the manifest."""
+  """Invoke the graph from start_index (names already installed by caller)."""
   learn_flags = [{"learn": s.get("learn", True)} for s in seats]
   graph = build_pipeline(players, config, store, win_rate_window=wrw, roster=learn_flags, seed_base=seed_base, verbose=verbose)
   graph.invoke({"index": start_index, "target": games})
   for i, p in enumerate(players):
     store.save_memory(seat_label(i), p.memory.to_dict())
-  store.set_status("complete")
   return store

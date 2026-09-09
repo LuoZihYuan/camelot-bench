@@ -35,6 +35,10 @@ def main():
 
   # resume path: reconstruct everything from the saved run on disk
   if args.resume is not None:
+    # resume takes all config from disk; only --verbose may accompany it
+    stray = argv_flags() - {"--resume", "--verbose"}
+    if stray:
+      ap.error("on --resume the run's config comes from disk; remove: " + ", ".join(sorted(stray)))
     run_id = args.resume or latest_incomplete_run()
     if not run_id:
       ap.error("no unfinished run found to resume")
@@ -94,7 +98,7 @@ def main():
 
 
 def _seat_count(run_id: str) -> int:
-  return len(RunStore(run_id).load_all_memory())
+  return len(RunStore(run_id).read_manifest().get("seats", []))
 
 
 def _summary(store) -> None:
