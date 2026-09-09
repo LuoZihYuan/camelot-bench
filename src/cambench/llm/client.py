@@ -25,18 +25,28 @@ class LLMClient:
     self.model = model or settings.default_model
     self.reasoning_effort = reasoning_effort if reasoning_effort is not None else settings.default_reasoning_effort
 
+  def _base_settings(self) -> dict:
+    """Model settings shared by every call: reasoning effort + provider caching."""
+    s: dict = {}
+    if self.reasoning_effort:
+      s["thinking"] = self.reasoning_effort
+    # Anthropic needs an explicit cache breakpoint; OpenAI and Google cache implicitly.
+    if self.model.startswith("anthropic:"):
+      s["anthropic_cache_instructions"] = True
+    return s
+
   def call(self, system_prompt: str, user_prompt: str, output_type):
     """One structured call -> validated output_type; game-legality is the caller's job."""
     effort = self.reasoning_effort
-    settings_used = {"thinking": effort} if effort else {}
+    settings_used = self._base_settings()
     for attempt in range(MAX_TRANSIENT_RETRIES + 1):
       try:
         return self._run(system_prompt, user_prompt, output_type, settings_used)
       except Exception as e:
         # reasoning-effort rejection: drop thinking and try once more, then continue
-        if settings_used and self._is_reasoning_rejection(e):
+        if effort and settings_used.get("thinking") and self._is_reasoning_rejection(e):
           self._warn(f"'{self.model}' rejected reasoning_effort='{effort}'; retrying without it.")
-          settings_used = {}
+          settings_used = {k: v for k, v in settings_used.items() if k != "thinking"}
           continue
         # transient (rate limit / overload): back off and retry
         if attempt < MAX_TRANSIENT_RETRIES and self._is_transient(e):
