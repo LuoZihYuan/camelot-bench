@@ -80,7 +80,13 @@ def build_pipeline(players, config, store, win_rate_window=10, roster=None, seed
         "winner": winner,
         "reason": rec.outcome["reason"],
         "roles": rec.outcome["roles"],
-        "seat_to_model": {seat_label(i): p.name for i, p in enumerate(players)},
+        "seats": {
+          seat_label(i): {
+            "model": p.name,
+            "reasoning_effort": p.client.reasoning_effort,
+          }
+          for i, p in enumerate(players)
+        },
       }
     )
     # per-game memory save -> resume point survives an interruption
