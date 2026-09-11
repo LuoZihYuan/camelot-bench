@@ -37,6 +37,7 @@ and each speaker names who speaks next (you cannot nominate yourself). You may
 speak at most {turns} times per proposal; once your turns are used you cannot
 speak again on that proposal. You may skip your turn by saying "Skip." -- this
 still uses the turn and you still name who speaks next.
+You may say anything when you speak.
 
 ## Winning
   - Good completes 3 Quests -> Good is winning, but the Assassin then names one
