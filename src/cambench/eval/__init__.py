@@ -1,19 +1,21 @@
-"""Read-only metrics over a run's records: win-rate, belief-accuracy, exposure."""
+"""Read-only metrics over a run's records: seat-level (skill) and game-level (dynamics)."""
 
-from .metrics import (
-    win_rate,
-    win_rate_trajectory,
-    belief_accuracy,
-    belief_accuracy_trajectory,
-    exposure_rate,
-    exposure_rate_trajectory,
+from .seats import (
+  win_rate,
+  win_rate_trajectory,
+  belief_accuracy,
+  belief_accuracy_trajectory,
+  exposure_rate,
+  exposure_rate_trajectory,
 )
+from .games import game_table
 
 __all__ = [
-    "win_rate",
-    "win_rate_trajectory",
-    "belief_accuracy",
-    "belief_accuracy_trajectory",
-    "exposure_rate",
-    "exposure_rate_trajectory",
+  "win_rate",
+  "win_rate_trajectory",
+  "belief_accuracy",
+  "belief_accuracy_trajectory",
+  "exposure_rate",
+  "exposure_rate_trajectory",
+  "game_table",
 ]
