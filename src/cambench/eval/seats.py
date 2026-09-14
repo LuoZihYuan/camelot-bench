@@ -1,4 +1,4 @@
-"""Seat-level metrics over a run's records: win-rate, belief-accuracy, exposure."""
+"""Seat-level metrics over a run's records: win-rate, belief-accuracy, hidden-rate."""
 
 from __future__ import annotations
 
@@ -73,34 +73,35 @@ def _game_belief_accuracy(rec: dict, seat_keys: dict, by: str | None) -> dict:
   return _aggregate_game(snaps, seat_keys, truth.get, by)
 
 
-def _snapshot_exposure(ev: dict, target: str, truth: dict, known: dict):
-  """(role_frac, side_frac) for how well OTHERS guessed `target` in one vote.
+def _snapshot_hidden(ev: dict, target: str, truth: dict, known: dict):
+  """(role_frac, side_frac) for how well `target` stayed HIDDEN in one vote --
+  the fraction of eligible guessers who failed to identify it.
 
   Every eligible guesser counts (all others who were NOT told about `target`).
-  A guesser who omitted `target` counts as not exposing it (a miss on both). None
-  if there are no eligible guessers.
+  A guesser who omitted `target` counts as failing to identify it (hidden on
+  both). None if there are no eligible guessers.
   """
   t_role = truth.get(target)
   if t_role is None:
     return None
-  role_hit = side_hit = n = 0
+  role_miss = side_miss = n = 0
   for guesser, ov in ev.get("private", {}).items():
     if guesser == target or "belief" not in ov:
       continue
     prior = set(known.get(guesser, {}).get("known_evil", [])) | set(known.get(guesser, {}).get("merlin_candidates", []))
     if target in prior:  # this guesser was told about the target
       continue
-    guess = (ov.get("belief") or {}).get(target)  # None if omitted -> not exposed
-    role_hit += int(guess == t_role)
-    side_hit += int(guess is not None and _side_of(guess) == _side_of(t_role))
+    guess = (ov.get("belief") or {}).get(target)  # None if omitted -> stays hidden
+    role_miss += int(guess != t_role)
+    side_miss += int(guess is None or _side_of(guess) != _side_of(t_role))
     n += 1
   if n == 0:
     return None
-  return (role_hit / n, side_hit / n)
+  return (role_miss / n, side_miss / n)
 
 
-def _game_exposure(rec: dict, seat_keys: dict, by: str | None) -> dict:
-  """One game's per-seat exposure: each target scored on how others guessed it."""
+def _game_hidden(rec: dict, seat_keys: dict, by: str | None) -> dict:
+  """One game's per-seat hidden-rate: each target scored on how well it stayed hidden."""
   truth = rec["assignment"]
   known = rec["initial_knowledge"]
   snaps: dict = {}  # target -> [(role, side) per vote]
@@ -108,7 +109,7 @@ def _game_exposure(rec: dict, seat_keys: dict, by: str | None) -> dict:
     if ev.get("type") != "vote":
       continue
     for target in truth:  # every seat is a possible target
-      s = _snapshot_exposure(ev, target, truth, known)
+      s = _snapshot_hidden(ev, target, truth, known)
       if s is not None:
         snaps.setdefault(target, []).append(s)
   return _aggregate_game(snaps, seat_keys, truth.get, by)
@@ -225,9 +226,9 @@ def belief_accuracy_trajectory(run_dir: str, by: str | None = None, window: int 
   return out
 
 
-def exposure_rate(run_dir: str, by: str | None = None) -> dict:
-  """How exposed each seat is: how well OTHERS identify it (macro: vote -> game
-  -> run mean). Low = the seat hides well. Mirror of belief_accuracy.
+def hidden_rate(run_dir: str, by: str | None = None) -> dict:
+  """How well hidden each seat is: how often OTHERS fail to identify it (macro:
+  vote -> game -> run mean). Higher = better hidden. Mirror of belief_accuracy.
 
   Guesses by players who were told about the target are excluded (deduction,
   not recall). Each game contributes once (mean of its votes).
@@ -238,12 +239,12 @@ def exposure_rate(run_dir: str, by: str | None = None) -> dict:
 
   Returns:
       {"model@effort#seat": {group: {exact, align, n_games}}}, where exact/align are
-      how often others got this seat's exact role / alignment right.
+      how often others got this seat's exact role / alignment WRONG.
   """
   seat_keys_by_game = _seat_keys(run_dir)
   acc: dict = {}
   for idx, rec in _read_records(run_dir):
-    game = _game_exposure(rec, seat_keys_by_game.get(idx, {}), by)
+    game = _game_hidden(rec, seat_keys_by_game.get(idx, {}), by)
     for key, groups in game.items():
       for g, score in groups.items():
         acc.setdefault(key, {}).setdefault(g, []).append(score)
@@ -259,8 +260,8 @@ def exposure_rate(run_dir: str, by: str | None = None) -> dict:
   return out
 
 
-def exposure_rate_trajectory(run_dir: str, by: str | None = None, window: int = 10) -> dict:
-  """Per-seat rolling exposure over games (expanding-then-sliding).
+def hidden_rate_trajectory(run_dir: str, by: str | None = None, window: int = 10) -> dict:
+  """Per-seat rolling hidden-rate over games (expanding-then-sliding).
 
   Returns:
       {"model@effort#seat": {group: {"exact": [series], "align": [series]}}}.
@@ -269,7 +270,7 @@ def exposure_rate_trajectory(run_dir: str, by: str | None = None, window: int = 
   role_seq: dict = {}
   side_seq: dict = {}
   for idx, rec in _read_records(run_dir):
-    game = _game_exposure(rec, seat_keys_by_game.get(idx, {}), by)
+    game = _game_hidden(rec, seat_keys_by_game.get(idx, {}), by)
     for key, groups in game.items():
       for g, (r, s) in groups.items():
         role_seq.setdefault(key, {}).setdefault(g, []).append(r)
@@ -279,4 +280,55 @@ def exposure_rate_trajectory(run_dir: str, by: str | None = None, window: int = 
     out[key] = {}
     for g in role_seq[key]:
       out[key][g] = {"exact": _rolling(role_seq[key][g], window), "align": _rolling(side_seq[key][g], window)}
+  return out
+
+
+def role_counts(run_dir: str) -> dict:
+  """How many times each seat was dealt each role.
+
+  Returns:
+      {"model@effort#seat": {role: count}} -- a role-assignment tally per seat,
+      useful for checking that roles were distributed fairly across seats.
+  """
+  out: dict = {}
+  for row in _read_ledger(run_dir):
+    roles = row["roles"]
+    for name, info in row["seats"].items():
+      key = _seat_key(name, info)
+      role = roles[name]
+      out.setdefault(key, {})[role] = out.setdefault(key, {}).get(role, 0) + 1
+  return out
+
+
+def assassination(run_dir: str) -> dict:
+  """Per-seat assassination outcomes at the end-game kill.
+
+  Only games that reached an assassination count. For each seat:
+    as_assassin -- {hits, n}: times it correctly picked Merlin / times it was
+                   the assassin.
+    as_merlin   -- {survived, n}: times it avoided the kill / times it was
+                   Merlin facing the assassin.
+
+  Returns {"model@effort#seat": {"as_assassin": {...}, "as_merlin": {...}}}.
+  Sparse at low game counts -- each seat is assassin or Merlin only occasionally.
+  """
+  seat_keys_by_game = _seat_keys(run_dir)
+  out: dict = {}
+  for idx, rec in _read_records(run_dir):
+    ev = next((e for e in rec["events"] if e.get("type") == "assassinate"), None)
+    if ev is None:
+      continue
+    keys = seat_keys_by_game.get(idx, {})
+    truth = rec["assignment"]
+    hit = ev["payload"]["hit_merlin"]
+    assassin = ev["payload"]["assassin"]
+    merlin = next((n for n, r in truth.items() if r == "merlin"), None)
+    if assassin in keys:
+      cell = out.setdefault(keys[assassin], {}).setdefault("as_assassin", {"hits": 0, "n": 0})
+      cell["hits"] += int(hit)
+      cell["n"] += 1
+    if merlin in keys:
+      cell = out.setdefault(keys[merlin], {}).setdefault("as_merlin", {"survived": 0, "n": 0})
+      cell["survived"] += int(not hit)
+      cell["n"] += 1
   return out

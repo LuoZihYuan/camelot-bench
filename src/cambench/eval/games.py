@@ -17,9 +17,6 @@ def game_table(run_dir: str) -> list:
       assassinated   -- True if good was undone by the assassination
       proposals      -- team proposals put to a vote (a game-length measure)
       rejections     -- proposals that were voted down
-      approvals      -- proposals that passed
-      approval_rate  -- approvals / proposals
-      max_rejects    -- most rejections seen on a single quest (contentiousness)
       quests_played  -- quests that reached a card play
       successes      -- successful quests
       fails          -- failed quests
@@ -32,14 +29,7 @@ def game_table(run_dir: str) -> list:
     votes = [e for e in events if e.get("type") == "vote"]
 
     proposals = len(votes)
-    approvals = sum(1 for e in votes if e["payload"].get("approved"))
-    rejections = proposals - approvals
-    rejects_by_quest: dict = {}
-    for e in votes:
-      if not e["payload"].get("approved"):
-        qi = e["payload"].get("quest_index")
-        rejects_by_quest[qi] = rejects_by_quest.get(qi, 0) + 1
-    max_rejects = max(rejects_by_quest.values()) if rejects_by_quest else 0
+    rejections = sum(1 for e in votes if not e["payload"].get("approved"))
 
     rows.append(
       {
@@ -50,9 +40,6 @@ def game_table(run_dir: str) -> list:
         "assassinated": rec["reason"] == "merlin_assassinated",
         "proposals": proposals,
         "rejections": rejections,
-        "approvals": approvals,
-        "approval_rate": approvals / proposals if proposals else 0.0,
-        "max_rejects": max_rejects,
         "quests_played": len(quests),
         "successes": rec.get("successes"),
         "fails": rec.get("fails"),
@@ -60,3 +47,37 @@ def game_table(run_dir: str) -> list:
       }
     )
   return rows
+
+
+def hammer_blunders(run_dir: str) -> dict:
+  """Per seat: rejections of the final proposal in a game lost to five straight
+  rejections. A good player voting reject there throws the game outright, so it
+  is an unambiguous strategic error.
+
+  Returns:
+      {"model@effort#seat": {"blunders": int, "hammer_games": int}}, where
+      hammer_games is the five-reject games the seat played as good (the
+      denominator) and blunders is those in which it rejected the final proposal.
+  """
+  from ._io import seat_keys, side_of
+
+  keys_by_game = seat_keys(run_dir)
+  out: dict = {}
+  for idx, rec in read_records(run_dir):
+    if rec["reason"] != "five_consecutive_rejects":
+      continue
+    truth = rec["assignment"]
+    keys = keys_by_game.get(idx, {})
+    votes = [e for e in rec["events"] if e.get("type") == "vote"]
+    if not votes:
+      continue
+    final_votes = max(votes, key=lambda e: e["payload"].get("attempt", 0))["payload"].get("votes", {})
+    for name, role in truth.items():
+      if side_of(role) != "good":
+        continue
+      key = keys.get(name, name)
+      cell = out.setdefault(key, {"blunders": 0, "hammer_games": 0})
+      cell["hammer_games"] += 1
+      if final_votes.get(name) is False:
+        cell["blunders"] += 1
+  return out
