@@ -11,6 +11,7 @@ from ._io import (
   groups as _groups,
   wilson as _wilson,
   rolling as _rolling,
+  mean_ci as _mean_ci,
 )
 
 
@@ -163,7 +164,7 @@ def belief_accuracy(run_dir: str, by: str | None = None) -> dict:
       by: split each seat's games -- None (overall), "side", or "role".
 
   Returns:
-      {"model@effort#seat": {group: {exact, align, n_games}}}.
+      {"model@effort#seat": {group: {exact: {mean, ci_low, ci_high}, align: {...}, n_games}}}.
   """
   seat_keys_by_game = _seat_keys(run_dir)
   acc: dict = {}  # seat_key -> group -> [(exact, align) per game]
@@ -176,11 +177,7 @@ def belief_accuracy(run_dir: str, by: str | None = None) -> dict:
   for key, groups in acc.items():
     out[key] = {}
     for g, games in groups.items():
-      out[key][g] = {
-        "exact": sum(x[0] for x in games) / len(games),
-        "align": sum(x[1] for x in games) / len(games),
-        "n_games": len(games),
-      }
+      out[key][g] = {"exact": _mean_ci([x[0] for x in games]), "align": _mean_ci([x[1] for x in games]), "n_games": len(games)}
   return out
 
 
@@ -238,7 +235,7 @@ def hidden_rate(run_dir: str, by: str | None = None) -> dict:
       by: split each seat's games -- None (overall), "side", or "role".
 
   Returns:
-      {"model@effort#seat": {group: {exact, align, n_games}}}, where exact/align are
+      {"model@effort#seat": {group: {exact: {mean, ci_low, ci_high}, align: {...}, n_games}}}. where exact/align are
       how often others got this seat's exact role / alignment WRONG.
   """
   seat_keys_by_game = _seat_keys(run_dir)
@@ -252,11 +249,7 @@ def hidden_rate(run_dir: str, by: str | None = None) -> dict:
   for key, groups in acc.items():
     out[key] = {}
     for g, games in groups.items():
-      out[key][g] = {
-        "exact": sum(x[0] for x in games) / len(games),
-        "align": sum(x[1] for x in games) / len(games),
-        "n_games": len(games),
-      }
+      out[key][g] = {"exact": _mean_ci([x[0] for x in games]), "align": _mean_ci([x[1] for x in games]), "n_games": len(games)}
   return out
 
 
@@ -301,19 +294,20 @@ def role_counts(run_dir: str) -> dict:
 
 
 def assassination(run_dir: str) -> dict:
-  """Per-seat assassination outcomes at the end-game kill.
+  """Per-seat assassination outcomes at the end-game kill, with Wilson 95% CIs.
 
   Only games that reached an assassination count. For each seat:
-    as_assassin -- {hits, n}: times it correctly picked Merlin / times it was
-                   the assassin.
-    as_merlin   -- {survived, n}: times it avoided the kill / times it was
-                   Merlin facing the assassin.
+    as_assassin -- {rate, ci_low, ci_high, hits, n}: correctly picked Merlin,
+                   over the times it was the assassin.
+    as_merlin   -- {rate, ci_low, ci_high, survived, n}: avoided the kill, over
+                   the times it was Merlin facing the assassin.
 
   Returns {"model@effort#seat": {"as_assassin": {...}, "as_merlin": {...}}}.
-  Sparse at low game counts -- each seat is assassin or Merlin only occasionally.
+  Sparse at low game counts -- each seat is assassin or Merlin only occasionally,
+  so the CIs are wide.
   """
   seat_keys_by_game = _seat_keys(run_dir)
-  out: dict = {}
+  tally: dict = {}  # key -> {"as_assassin": [hits, n], "as_merlin": [survived, n]}
   for idx, rec in _read_records(run_dir):
     ev = next((e for e in rec["events"] if e.get("type") == "assassinate"), None)
     if ev is None:
@@ -324,11 +318,19 @@ def assassination(run_dir: str) -> dict:
     assassin = ev["payload"]["assassin"]
     merlin = next((n for n, r in truth.items() if r == "merlin"), None)
     if assassin in keys:
-      cell = out.setdefault(keys[assassin], {}).setdefault("as_assassin", {"hits": 0, "n": 0})
-      cell["hits"] += int(hit)
-      cell["n"] += 1
+      c = tally.setdefault(keys[assassin], {}).setdefault("as_assassin", [0, 0])
+      c[0] += int(hit)
+      c[1] += 1
     if merlin in keys:
-      cell = out.setdefault(keys[merlin], {}).setdefault("as_merlin", {"survived": 0, "n": 0})
-      cell["survived"] += int(not hit)
-      cell["n"] += 1
+      c = tally.setdefault(keys[merlin], {}).setdefault("as_merlin", [0, 0])
+      c[0] += int(not hit)
+      c[1] += 1
+
+  out: dict = {}
+  for key, roles in tally.items():
+    out[key] = {}
+    for role, (good, n) in roles.items():
+      lo, hi = _wilson(good, n)
+      count_field = "hits" if role == "as_assassin" else "survived"
+      out[key][role] = {"rate": good / n if n else 0.0, "ci_low": lo, "ci_high": hi, count_field: good, "n": n}
   return out

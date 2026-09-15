@@ -72,3 +72,18 @@ def rolling(series: list, window: int) -> list:
     chunk = series[max(0, i - window) : i]
     out.append(sum(chunk) / len(chunk))
   return out
+
+
+def mean_ci(values: list, z: float = 1.96) -> dict:
+  """Mean of `values` with a normal-approx CI on the mean, clipped to [0, 1].
+
+  Uses z * std / sqrt(n) (t and z coincide closely at the game counts here).
+  A single value yields a zero-width interval at its own position.
+  """
+  n = len(values)
+  m = sum(values) / n
+  if n < 2:
+    return {"mean": m, "ci_low": m, "ci_high": m}
+  var = sum((v - m) ** 2 for v in values) / (n - 1)
+  half = z * (var / n) ** 0.5
+  return {"mean": m, "ci_low": max(0.0, m - half), "ci_high": min(1.0, m + half)}
