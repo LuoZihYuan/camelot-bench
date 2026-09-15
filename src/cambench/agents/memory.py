@@ -13,6 +13,7 @@ class Memory:
   """Combine memory: rewritable curated notes + a FIFO window of recent game logs + own results."""
 
   curated: str = ""
+  curated_history: list = field(default_factory=list)  # each game's notes, for inspection (agent never reads)
   window: list = field(default_factory=list)
   results: list = field(default_factory=list)  # this agent's own per-game outcomes
   provenance: dict = field(default_factory=dict)  # {model, reasoning_effort, learn, memory}; metadata only
@@ -25,6 +26,7 @@ class Memory:
     if len(self.window) > self.window_size:
       self.window = self.window[-self.window_size :]
     self.curated = new_curated.strip()[: self.notes_chars]
+    self.curated_history.append(self.curated)  # record; the agent still reads only `curated`
 
   def record_result(self, result: dict) -> None:
     """Record a game outcome even when memory isn't otherwise updated (e.g. not learning)."""
@@ -41,6 +43,7 @@ class Memory:
   def to_dict(self) -> dict:
     return {
       "curated": self.curated,
+      "curated_history": list(self.curated_history),
       "window": list(self.window),
       "results": list(self.results),
       "provenance": dict(self.provenance),
@@ -53,6 +56,7 @@ class Memory:
     # a loading player uses only curated/window/results; provenance is metadata that travels
     return cls(
       curated=d.get("curated", ""),
+      curated_history=list(d.get("curated_history", [])),
       window=list(d.get("window", [])),
       results=list(d.get("results", [])),
       provenance=dict(d.get("provenance", {})),
