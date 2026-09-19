@@ -18,7 +18,7 @@ The two strongest models in our 100-game run, **gemini-3.7-flash** and **gemini-
 
 ## **Overview**
 
-camelot-bench runs full games of *The Resistance: Avalon* (5-10 players, all special roles) between language-model agents and scores not just who wins, but how well each model performs the reasoning the game demands: deducing hidden roles, concealing its own, and finding Merlin in the final assassination. Agents accumulate memory across games, so the benchmark also captures whether they improve over a run.
+camelot-bench is a multi-agent LLM benchmark that runs full games of *The Resistance: Avalon* (5-10 players, all special roles) between language-model agents and scores not just who wins, but how well each model performs the reasoning the game demands: deducing hidden roles, concealing its own, and finding Merlin in the final assassination. Agents accumulate memory across games, so the benchmark also captures whether they improve over a run. The engine is pure-Python and deterministic; agents are built with [Pydantic AI](https://ai.pydantic.dev/) and games are orchestrated with [LangGraph](https://langchain-ai.github.io/langgraph/).
 
 
 ## **Usage**
