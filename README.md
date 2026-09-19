@@ -153,7 +153,7 @@ Agents write and revise their own strategy notes after every game. Across the sa
   > 
   > ## Merlin Camouflage & Survival (Critical)
   > - **Zero Lone Dissent**: NEVER be the sole Reject against unexposed Morgana/Evil on Q1/Q2 before failure data exists. Early lone dissent against unexposed Evil provides 100% mathematical certainty to the Assassin via hard-exclusion of Evil-approvers.
-  > - **Procedural Soft Hedging**: Always hedge (\"useful evidence, not permanent clearance / absolute certainty\") even when backing undefeated winning cores at match point.
+  > - **Procedural Soft Hedging**: Always hedge ("useful evidence, not permanent clearance / absolute certainty") even when backing undefeated winning cores at match point.
   > - **Standard Expansion Flow**: Propose routine single-variable expansions carrying forward zero-fail cores using standard procedural phrasing; blend seamlessly into table cushion resets.
   > 
   > ## Percival & Loyal Servant Guidelines
@@ -163,7 +163,7 @@ Agents write and revise their own strategy notes after every game. Across the sa
   >   - *2-Candidate Trap*: Never approve a team containing BOTH seen candidates {Merlin, Morgana}.
   >   - *Multi-Fail Overlap*: If Player A is on multiple failed quests, Player A is confirmed Evil. Do NOT assume untested outside players are Good.
   >   - *Lone Dissent Signal*: Sole Reject against unexposed Evil on Q1/Q2 is almost certainly Merlin acting on secret knowledge.
-  >   - *Diagnostic & Hammer Traps*: Do NOT approve risky \"diagnostic\" teams or rush untested seats at match point just to avoid P5 hammer\u2014Evil exploits this to manufacture 3\u20132 majorities.
+  >   - *Diagnostic & Hammer Traps*: Do NOT approve risky "diagnostic" teams or rush untested seats at match point just to avoid P5 hammer—Evil exploits this to manufacture 3–2 majorities.
   > 
   > ## Evil & Assassin Tactics
   > - **Process-of-Elimination Assassination**:
@@ -174,7 +174,7 @@ Agents write and revise their own strategy notes after every game. Across the sa
   >   2. *Merlin Identification*:
   >      - *Sole Early Dissenter*: The player who cast lone dissent against unexposed Evil on Q1/Q2 before failure data existed.
   >      - The sole un-excluded Good player remaining after eliminating evil-proposers, evil-approvers, and active Percival decoys.
-  > - **Exploiting Town Biases & Cushion**: Echo LS diagnostic framing or fear of P5 hammer to lock in 3\u20132 majorities (2 Evil + 1 LS) and pass Evil onto match-point quests.
+  > - **Exploiting Town Biases & Cushion**: Echo LS diagnostic framing or fear of P5 hammer to lock in 3–2 majorities (2 Evil + 1 LS) and pass Evil onto match-point quests.
   > - **Camouflage & Blending**: Blend seamlessly with standard town procedure and soft hedging to keep Percival split and let Good advance to 3 wins if Merlin is already identified.
   > 
   > </details>
@@ -187,13 +187,13 @@ Agents write and revise their own strategy notes after every game. Across the sa
   > ## Merlin Camouflage & Anti-Assassination
   > - **Zero Early Prescient Dissent (Fatal Rule)**: NEVER lone-dissent on Q1/Q2 against unexposed Evil before failure data exists. Mirror consensus with procedural soft hedging.
   > - **Clairvoyant Proposal Trap (Fatal POE Signature)**: If Merlin's proposals are 100% zero-Evil across the game while Percival proposed an Evil candidate (e.g. Percival tested Morgana on Q2), Assassin gets an airtight POE kill on Merlin. When leading Q1 or Q2, do not seek clairvoyant perfection; proposing standard rotational pairs or mirroring town branches avoids the 100% clean proposal POE signature.
-  > - **Tone & Hedging**: Blend speech length and turn-passing. NEVER act as the primary deductive organizer or claim certainty (\"mathematically verified\"). Consistently use procedural soft hedging (\"treating outcomes strictly as diagnostic evidence rather than permanent clearance\"). Let vocal Loyal Servants / Percival draw Assassin fire.
+  > - **Tone & Hedging**: Blend speech length and turn-passing. NEVER act as the primary deductive organizer or claim certainty ("mathematically verified"). Consistently use procedural soft hedging ("treating outcomes strictly as diagnostic evidence rather than permanent clearance"). Let vocal Loyal Servants / Percival draw Assassin fire.
   > 
   > ## Percival & Loyal Servant Guidelines
-  > - **Aggressive Decoy Shielding**: Vocalize expansion-isolation proofs, mathematical pool partitions, and voting dissent patterns with decisive authority (\"mathematically verified\", \"100% clean\") to draw Assassin kill shots away from Merlin.
+  > - **Aggressive Decoy Shielding**: Vocalize expansion-isolation proofs, mathematical pool partitions, and voting dissent patterns with decisive authority ("mathematically verified", "100% clean") to draw Assassin kill shots away from Merlin.
   > - **Candidate Elimination & P4 Lock-in**:
   >   - If candidate Morgana fails on Q1/Q2/Q3, the other candidate is 100% Merlin. Percival MUST aggressively back Merlin and treat P4 as mandatory lock-in to prevent paranoid rejections into an Evil P5 hammer trap.
-  >   - An \"untested\" Merlin candidate is mathematically superior to taking an exposed failure-pool seat or facing an Evil hammer.
+  >   - An "untested" Merlin candidate is mathematically superior to taking an exposed failure-pool seat or facing an Evil hammer.
   > - **Disjoint Partition & Dissent Isolation Proof**:
   >   - *2 Fails on 2p (Q1)*: Confines both Evil to that pair; off-mission trio is 100% hard-cleared Good for Q2, Q3 (any pair), and Q4.
   >   - *2 Fails on 3p*: Confines both Evil to that trio; off-mission pair is 100% verified Good. Lock them on Q3 (size 2).
@@ -203,7 +203,7 @@ Agents write and revise their own strategy notes after every game. Across the sa
   > - **Process-of-Elimination (POE) Assassination Rules**:
   >   1. *Merlin Clairvoyant Proposal Signature (100% Merlin)*: If Player A's proposals NEVER include either Evil player across the entire match (100% all-Good rosters), while Player B proposes candidate branches or pairs with Morgana/Merlin candidates (e.g. {Percival, Morgana, Candidate}), Player A is Merlin and Player B is Percival.
   >   2. *Early Prescient Dissent Signature (100% Merlin)*: Any player who lone-dissented on Q1/Q2 against unexposed Evil before failure data existed is 100% Merlin.
-  >   3. *Vocal Decoy Trap*: NEVER assassinate the vocal late-game deductive organizer who leads town math, calls out vote patterns, or claims certainty\u2014they are almost always Percival or Loyal Servants acting as decoys. Check proposal history and soft hedging to find the quiet Merlin.
+  >   3. *Vocal Decoy Trap*: NEVER assassinate the vocal late-game deductive organizer who leads town math, calls out vote patterns, or claims certainty—they are almost always Percival or Loyal Servants acting as decoys. Check proposal history and soft hedging to find the quiet Merlin.
   > - **Morgana Camouflage & Pacing**: Adopt standard town phrasing with procedural soft hedging. Mirror Percival's pacing arguments to secure winning approvals or force P5 hammers. Avoid double-failing on size-2 missions if single fail suffices.
   > 
   > </details>
@@ -234,7 +234,7 @@ Agents write and revise their own strategy notes after every game. Across the sa
   > <details>
   > <summary>Game 100</summary>
   > 
-  > Core: Fails hard; passes soft except 0-Fail when every Evil had to Fail to prevent immediate Evil win—2014then exact roster hard-clears. Enumerate role-consistent worlds after every Fail; rhetoric/self-claims/votes nonproof. 5p: two 1-Fail 2-seat missions overlap => overlap Evil; 2-Fail team contains both Evils. Don’t mechanically burn cushion: reject unsafe constrained branches before hammer; approve best hammer branch.
+  > Core: Fails hard; passes soft except 0-Fail when every Evil had to Fail to prevent immediate Evil win—then exact roster hard-clears. Enumerate role-consistent worlds after every Fail; rhetoric/self-claims/votes nonproof. 5p: two 1-Fail 2-seat missions overlap => overlap Evil; 2-Fail team contains both Evils. Don’t mechanically burn cushion: reject unsafe constrained branches before hammer; approve best hammer branch.
   > 
   > Good: zero-Fail cores/controlled reruns and one-seat expansions useful, but passing Evil possible. Pass then Fail after one addition implicates addition. A known-Good card on a 1-Fail pair fixes partner; use public structural logic without turning private certainty into repeated targeting. At match point reject teams unsafe in any consistent world before hammer. In forced splits, public-risk rhetoric is weak; Evil can mimic.
   > 
