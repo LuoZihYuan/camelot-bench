@@ -256,8 +256,10 @@ class AvalonGame:
       c, r = self._unwrap(self.players[seat].quest_card(self._log(seat), self._ctx(seat)))
       if not c:
         fails += 1
+      overlay = {"sabotaged": not c}  # True if this seat played a Fail card
       if r:
-        qreasons[seat] = {"reasoning": r}
+        overlay["reasoning"] = r
+      qreasons[seat] = overlay
     required = self.fails_required[self.current_quest]
     success = fails < required
 
