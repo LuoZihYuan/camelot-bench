@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "camelot-bench"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
   "langgraph>=1.2.11",
   "langgraph-checkpoint-sqlite>=3.1.1",

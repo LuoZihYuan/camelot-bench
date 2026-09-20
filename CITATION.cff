@@ -28,7 +28,7 @@ keywords:
   - langgraph
   - pydantic-ai
 license: Apache-2.0
-version: 0.1.0
+version: 1.0.0
 date-released: '2026-09-16'
 references:
   - type: dataset

@@ -1,0 +1,31 @@
+{
+  "creators": [
+    {
+      "name": "Luo, Zih-Yuan",
+      "orcid": "0009-0003-4159-0318"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Luo, Zih-Yuan",
+      "orcid": "0009-0003-4159-0318"
+    }
+  ],
+  "title": "camelot-bench",
+  "version": "1.0.0",
+  "access_right": "open",
+  "keywords": [
+    "llm-agents",
+    "multi-agent",
+    "game-playing",
+    "social-deduction",
+    "avalon",
+    "deception",
+    "llm-evaluation",
+    "langgraph",
+    "pydantic-ai"
+  ],
+  "license": "apache-2.0",
+  "upload_type": "software",
+  "language": "eng"
+}
