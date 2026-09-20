@@ -5,12 +5,6 @@
       "orcid": "0009-0003-4159-0318"
     }
   ],
-  "contributors": [
-    {
-      "name": "Luo, Zih-Yuan",
-      "orcid": "0009-0003-4159-0318"
-    }
-  ],
   "title": "camelot-bench",
   "version": "1.0.0",
   "access_right": "open",
