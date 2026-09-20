@@ -14,15 +14,16 @@ dependencies = [
 ]
 requires-python = ">=3.13"
 authors = [
-  { name = "LuoZihYuan", email = "zihyuan.luo@gmail.com" }
+  { name = "Zih-Yuan Luo", email = "zihyuan.luo@gmail.com" }
 ]
 maintainers = [
-  { name = "LuoZihYuan", email = "zihyuan.luo@gmail.com" }
+  { name = "Zih-Yuan Luo", email = "zihyuan.luo@gmail.com" }
 ]
 description = "A multi-agent LLM benchmark using the hidden-role game Avalon to measure reasoning under deception via self-play, cross-game memory, and belief-accuracy scoring."
 readme = "README.md"
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*", "NOTICE*"]
+keywords = ["llm-agents", "multi-agent", "game-playing", "social-deduction", "avalon", "deception", "llm-evaluation", "langgraph", "pydantic-ai"]
 
 [dependency-groups]
 dev = [
@@ -33,7 +34,7 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/LuoZihYuan/camelot-bench.git"
+Repository = "https://github.com/LuoZihYuan/camelot-bench"
 "Bug Tracker" = "https://github.com/LuoZihYuan/camelot-bench/issues"
 
 [project.scripts]
