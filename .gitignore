@@ -3,6 +3,7 @@ data/*
 !data/.gitkeep
 roster.yaml
 !roster.example.yaml
+dataset/
 
 # Python -------------------------------------------------
 __pycache__/

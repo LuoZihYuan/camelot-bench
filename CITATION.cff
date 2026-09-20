@@ -1,0 +1,43 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: camelot-bench
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - email: zihyuan.luo@gmail.com
+    given-names: Zih-Yuan
+    family-names: Luo
+    orcid: 'https://orcid.org/0009-0003-4159-0318'
+repository-code: 'https://github.com/LuoZihYuan/camelot-bench'
+abstract: >-
+  A multi-agent LLM benchmark using the hidden-role game
+  Avalon to measure reasoning under deception via self-play,
+  cross-game memory, and belief-accuracy scoring
+keywords:
+  - llm-agents
+  - multi-agent
+  - game-playing
+  - social-deduction
+  - avalon
+  - deception
+  - llm-evaluation
+  - langgraph
+  - pydantic-ai
+license: Apache-2.0
+version: 0.1.0
+date-released: '2026-09-16'
+references:
+  - type: dataset
+    title: camelot-bench dataset
+    version: 1.0.0
+    authors:
+      - email: zihyuan.luo@gmail.com
+        given-names: Zih-Yuan
+        family-names: Luo
+        orcid: 'https://orcid.org/0009-0003-4159-0318'
+    doi: 10.5281/zenodo.22856611
+    repository: 'https://doi.org/10.5281/zenodo.22856611'
