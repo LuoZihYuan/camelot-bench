@@ -12,6 +12,9 @@ authors:
     given-names: Zih-Yuan
     family-names: Luo
     orcid: 'https://orcid.org/0009-0003-4159-0318'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22858217
 repository-code: 'https://github.com/LuoZihYuan/camelot-bench'
 abstract: >-
   A multi-agent LLM benchmark using the hidden-role game
@@ -29,7 +32,7 @@ keywords:
   - pydantic-ai
 license: Apache-2.0
 version: 1.0.0
-date-released: '2026-09-16'
+date-released: '2026-09-21'
 references:
   - type: dataset
     title: camelot-bench dataset
@@ -39,5 +42,5 @@ references:
         given-names: Zih-Yuan
         family-names: Luo
         orcid: 'https://orcid.org/0009-0003-4159-0318'
-    doi: 10.5281/zenodo.22856611
-    repository: 'https://doi.org/10.5281/zenodo.22856611'
+    doi: 10.5281/zenodo.22856610
+    repository: 'https://huggingface.co/datasets/zihyuan/camelot-bench-dataset'

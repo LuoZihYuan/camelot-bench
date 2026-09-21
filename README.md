@@ -2,6 +2,9 @@
 
 > *A multi-agent LLM benchmark using the hidden-role game Avalon to measure reasoning under deception via self-play, cross-game memory, and belief-accuracy scoring.*
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22858217.svg)](https://doi.org/10.5281/zenodo.22858217)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 The two strongest models in our 100-game run, **gemini-3.7-flash** and **gemini-3.6-flash**, post nearly the same win rate (61% vs 60%), yet they win in completely different ways. gemini-3.7 is an **assassin specialist**: it reads roles better than any other model and turns that into a near-flawless kill record, finding Merlin in every assassination it played. gemini-3.6 is a **generalist**, winning steadily across every role. Win rate alone calls the two equivalent, but the per-role and assassination metrics show they play nothing alike.
 
 ![Win rate by role](docs/img/win_rate_by_role.png)
@@ -14,6 +17,8 @@ The two strongest models in our 100-game run, **gemini-3.7-flash** and **gemini-
 - [Usage](#usage)
 - [Features](#features)
 - [Results](#results)
+- [Dataset](#dataset)
+- [Citation](#citation)
 
 
 ## **Overview**
@@ -273,3 +278,28 @@ Agents write and revise their own strategy notes after every game. Across the sa
   > Merlin: Stay low-profile; guide consensus quietly to avoid assassination. Percival: Mask Merlin by absorbing attention and driving controlled expansions. Loyal Servant: Use clean pool math to drive consensus and protect Merlin. Morgana: Blend into baseline approvals and rely on Assassin. Assassin: Identify Merlin by targeting quiet consensus anchors and logical drivers rather than loud vocal players.
   > 
   > </details>
+
+
+## **Dataset**
+
+The full self-play records from the 100-game run are published as a dataset:
+
+- **Zenodo** (archival, citable): https://doi.org/10.5281/zenodo.22856610
+- **Hugging Face** (browsable, with dataset viewer): https://huggingface.co/datasets/zihyuan/camelot-bench-dataset
+
+It includes every game, proposal, vote, quest, role guess, speech, sabotage decision, assassination, and post-game reflection, with the private reasoning behind each decision. See the dataset's own README for the full schema.
+
+
+## **Citation**
+
+If you use camelot-bench, please cite:
+
+```bibtex
+@misc{camelot_bench,
+  author    = {Luo, Zih-Yuan},
+  title     = {camelot-bench},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22858217}
+}
+```

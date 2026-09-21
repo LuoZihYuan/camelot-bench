@@ -6,6 +6,7 @@
     }
   ],
   "title": "camelot-bench",
+  "description": "A multi-agent LLM benchmark using the hidden-role game Avalon to measure reasoning under deception via self-play, cross-game memory, and belief-accuracy scoring.",
   "version": "1.0.0",
   "access_right": "open",
   "keywords": [
@@ -21,5 +22,12 @@
   ],
   "license": "apache-2.0",
   "upload_type": "software",
-  "language": "eng"
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.22856610",
+      "relation": "isSourceOf",
+      "resource_type": "dataset"
+    }
+  ]
 }
