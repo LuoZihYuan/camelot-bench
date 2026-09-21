@@ -8,7 +8,8 @@ import json
 import pathlib
 from datetime import datetime, timezone
 
-from cambench.eval._io import read_ledger, read_records, side_of
+from cambench.eval._io import read_records, side_of
+from cambench.engine.labels import make_names
 
 
 # --- small writers -------------------------------------------------------
@@ -262,41 +263,41 @@ def _memory_rows(run_dir: str) -> list:
 
 
 def build_metadata(run_dir: str, tables: dict) -> dict:
-  ledger = read_ledger(run_dir)
-  roster = {}
-  for row in ledger:
-    for name, info in row.get("seats", {}).items():
-      roster.setdefault(
-        name,
-        {
-          "seat": name,
-          "model": info.get("model"),
-          "effort": info.get("reasoning_effort"),
-          "learn": info.get("learn"),
-          "memory_source": info.get("memory"),
-        },
-      )
+  manifest = _manifest(run_dir)
+  seats = manifest.get("seats", [])
+  seed_base = manifest.get("seed_base")
+  names = make_names(len(seats), seed_base) if seed_base is not None else [None] * len(seats)
+  roster = [
+    {
+      "seat": names[i],
+      "model": s.get("model"),
+      "effort": s.get("reasoning_effort"),
+      "learn": s.get("learn", True),
+      "memory_source": s.get("memory"),
+    }
+    for i, s in enumerate(seats)
+  ]
   return {
     "run_id": pathlib.Path(run_dir).name,
     "num_games": len(tables["games"]),
     "num_players_per_game": tables["games"][0]["num_players"] if tables["games"] else None,
-    "seed_base": _seed_base(run_dir),
-    "roster": list(roster.values()),
-    "generated_at": datetime.now(timezone.utc).isoformat(),
+    "seed_base": seed_base,
+    "roster": roster,
+    "generated_at": datetime.now().astimezone().isoformat(),
   }
 
 
-def _seed_base(run_dir: str):
-  """seed_base from the run manifest (results.jsonl line 1). Per-game seed = seed_base + game."""
+def _manifest(run_dir: str) -> dict:
+  """The run manifest (results.jsonl line 1): seed_base, seats config, windows."""
   path = pathlib.Path(run_dir) / "results.jsonl"
   if not path.exists():
-    return None
+    return {}
   with path.open(encoding="utf-8") as f:
     first = f.readline()
   try:
-    return json.loads(first).get("seed_base")
-  except (ValueError, AttributeError):
-    return None
+    return json.loads(first)
+  except (ValueError, TypeError):
+    return {}
 
 
 TABLE_FORMATS = {
