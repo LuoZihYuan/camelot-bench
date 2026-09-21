@@ -1,5 +1,7 @@
 # **camelot-bench Dataset**
 
+[![DOI](https://zenodo.org/badge/DOI/{{dataset_doi}}.svg)](https://doi.org/{{dataset_doi}})
+
 Full self-play records from a run of [camelot-bench]({{repo_url}}), a multi-agent LLM
 benchmark built on the social-deduction game *The Resistance: Avalon*. Every game,
 proposal, vote, quest, role guess, speech, and post-game reflection is included,
@@ -71,7 +73,6 @@ Only some are in play each game.
 </details>
 
 > [!IMPORTANT]
->
 > **Discussion (a non-standard house rule).** Before each vote, players speak in a
 > chain: the leader (proposer) speaks first, and each speaker names who speaks next
 > (a player cannot nominate themselves). Each player may speak at most 3 times per
@@ -95,7 +96,7 @@ A single object describing the run: its size, seeding, and the roster of models.
 - `roster` (list): one entry per seat, each with `seat`, `model`, `effort`, `learn` (whether it revised memory), and `memory_source` (a warm-start memory path, or null).
 - `generated_at` (string): ISO timestamp of when the dataset was exported.
 
-### **games.csv**
+### **games.jsonl**
 One row per game: the setup and final outcome of each game in the run.
 - `game` (integer): game number, 1-based.
 - `num_players` (integer): players in this game.
@@ -104,7 +105,7 @@ One row per game: the setup and final outcome of each game in the run.
 - `num_successes` (integer): quests that succeeded.
 - `num_fails` (integer): quests that failed.
 
-### **seats.csv**
+### **seats.jsonl**
 One row per (game, seat): the role each player was dealt that game and what they knew.
 - `game` (integer): game number, 1-based.
 - `seat` (string): the player's short name in this game, e.g. `K83V`.
@@ -134,7 +135,7 @@ One row per (proposal, voter): how each player voted on each proposed team.
 - `approved` (boolean): this seat's vote; true = approve, false = reject.
 - `reasoning` (string): the voter's private reasoning.
 
-### **quests.csv**
+### **quests.jsonl**
 One row per quest played: the outcome of each quest the game reached.
 - `game` (integer): game number, 1-based.
 - `quest` (integer): quest number, 0-based (0 to 4).

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import pathlib
 from datetime import datetime, timezone
@@ -15,25 +14,10 @@ from cambench.engine.labels import make_names
 # --- small writers -------------------------------------------------------
 
 
-def write_csv(path: pathlib.Path, rows: list, fields: list) -> None:
-  with path.open("w", newline="", encoding="utf-8") as f:
-    w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
-    w.writeheader()
-    for r in rows:
-      w.writerow({k: _cell(r.get(k)) for k in fields})
-
-
 def write_jsonl(path: pathlib.Path, rows: list) -> None:
   with path.open("w", encoding="utf-8") as f:
     for r in rows:
       f.write(json.dumps(r, ensure_ascii=False) + "\n")
-
-
-def _cell(v):
-  """CSV cell: serialize lists (e.g. team seats) as a JSON string, pass scalars."""
-  if isinstance(v, (list, dict)):
-    return json.dumps(v, ensure_ascii=False)
-  return v
 
 
 # --- per-table extraction ------------------------------------------------
@@ -300,27 +284,6 @@ def _manifest(run_dir: str) -> dict:
     return {}
 
 
-TABLE_FORMATS = {
-  "games": "csv",
-  "seats": "csv",
-  "quests": "csv",
-  "proposals": "jsonl",
-  "votes": "jsonl",
-  "sabotage": "jsonl",
-  "guesses": "jsonl",
-  "speeches": "jsonl",
-  "assassination": "jsonl",
-  "debriefs": "jsonl",
-  "memory": "jsonl",
-}
-
-CSV_FIELDS = {
-  "games": ["game", "num_players", "winner_side", "reason", "num_successes", "num_fails"],
-  "seats": ["game", "seat", "role", "side", "won", "known_evil_seats", "merlin_candidate_seats"],
-  "quests": ["game", "quest", "succeeded", "num_fails"],
-}
-
-
 CITATION = pathlib.Path(__file__).resolve().parent.parent / "CITATION.cff"
 
 
@@ -367,11 +330,7 @@ def write_dataset(run_dir: str, out_dir: str) -> None:
   meta = build_metadata(run_dir, tables)
 
   for name, rows in tables.items():
-    fmt = TABLE_FORMATS[name]
-    if fmt == "csv":
-      write_csv(out / f"{name}.csv", rows, CSV_FIELDS[name])
-    else:
-      write_jsonl(out / f"{name}.jsonl", rows)
+    write_jsonl(out / f"{name}.jsonl", rows)
 
   (out / "metadata.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
   (out / "README.md").write_text(_render_readme(tables, meta))
@@ -381,9 +340,7 @@ def write_dataset(run_dir: str, out_dir: str) -> None:
 
 def _render_readme(tables: dict, meta: dict) -> str:
   cite = _read_citation()
-  file_list = "\n".join(
-    f"- `{name}.{'csv' if TABLE_FORMATS[name] == 'csv' else 'jsonl'}` ({len(rows)} rows)" for name, rows in tables.items()
-  )
+  file_list = "\n".join(f"- `{name}.jsonl` ({len(rows)} rows)" for name, rows in tables.items())
   authors = " and ".join(cite.get("authors") or ["Luo, Zih-Yuan"])
   title = cite.get("title", "camelot-bench") + " dataset"
   dataset_doi = cite.get("dataset_doi") or "<dataset DOI>"
