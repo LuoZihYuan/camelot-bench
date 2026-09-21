@@ -1,6 +1,7 @@
 # **camelot-bench Dataset**
 
 [![DOI](https://zenodo.org/badge/DOI/{{dataset_doi}}.svg)](https://doi.org/{{dataset_doi}})
+[![License](https://img.shields.io/badge/License-CC_BY_4.0-blue.svg)](LICENSE)
 
 Full self-play records from a run of [camelot-bench]({{repo_url}}), a multi-agent LLM
 benchmark built on the social-deduction game *The Resistance: Avalon*. Every game,
