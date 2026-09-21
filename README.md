@@ -63,7 +63,6 @@ seats:
 ```
 
 > [!NOTE]
->
 > Per-seat fields:
 > - `model`: provider-prefixed model string (`openai:` / `anthropic:` / `google:`).
 > - `reasoning_effort`: `low`, `medium`, or `high` (omit to leave off).
@@ -79,7 +78,6 @@ uv run python scripts/train.py --config roster.yaml
 ```
 
 > [!TIP]
->
 > Interrupted runs resume exactly where they stopped. Run `uv run python scripts/train.py --resume` and the pipeline continues from the last completed game, with every agent's memory intact.
 
 ### **Analyzing Results**
