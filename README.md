@@ -284,6 +284,7 @@ The full self-play records from the 100-game run are published as a dataset:
 
 - **Zenodo** (archival, citable): https://doi.org/10.5281/zenodo.22856610
 - **Hugging Face** (browsable, with dataset viewer): https://huggingface.co/datasets/zihyuan/camelot-bench-dataset
+- **Kaggle** (browsable, with dataset viewer): https://www.kaggle.com/datasets/zihyuanluo/camelot-bench-dataset
 
 It includes every game, proposal, vote, quest, role guess, speech, sabotage decision, assassination, and post-game reflection, with the private reasoning behind each decision. See the dataset's own README for the full schema.
 
