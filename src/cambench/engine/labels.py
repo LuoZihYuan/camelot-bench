@@ -9,17 +9,19 @@ from __future__ import annotations
 
 import random
 import string
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 _DEFAULT = string.ascii_uppercase  # A..Z (letters, the default identity)
-_names: list[str] = list(_DEFAULT)  # current mapping: seat index -> name
+_names: ContextVar[tuple[str, ...]] = ContextVar("seat_names", default=tuple(_DEFAULT))
 
 
 def seat_label(seat: int) -> str:
-  return _names[seat]
+  return _names.get()[seat]
 
 
 def label_to_seat(label: str) -> int:
-  return _names.index(label)
+  return _names.get().index(label)
 
 
 def labels(seats) -> list:
@@ -28,8 +30,17 @@ def labels(seats) -> list:
 
 def set_names(names: list) -> None:
   """Install the per-run seat names (index -> name). Pass letters to reset."""
-  global _names
-  _names = list(names)
+  _names.set(tuple(names))
+
+
+@contextmanager
+def using_names(names: list[str]):
+  """Install names for one evaluation and restore the caller's context on exit."""
+  token = _names.set(tuple(names))
+  try:
+    yield
+  finally:
+    _names.reset(token)
 
 
 def reset_names() -> None:

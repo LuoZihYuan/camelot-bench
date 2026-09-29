@@ -8,6 +8,10 @@ from typing import Any, Optional, TypedDict
 from langgraph.graph import START, END, StateGraph
 
 
+class DecisionAborted(RuntimeError):
+  """Stop an evaluation instead of turning infrastructure/budget failures into moves."""
+
+
 class DecisionState(TypedDict, total=False):
   system: str
   user: str
@@ -28,6 +32,8 @@ def build_decision_graph(client, schema, validate, fallback):
   def call(state: DecisionState) -> dict:
     try:
       raw = client.call(state["system"], state["user"], schema)
+    except DecisionAborted:
+      raise
     except Exception:
       if os.environ.get("CAMBENCH_DEBUG"):
         import traceback
