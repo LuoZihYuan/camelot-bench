@@ -84,6 +84,18 @@ uv run python scripts/train.py --config roster.yaml
 
 Open `notebooks/seats.ipynb` (per-model metrics) and `notebooks/games.ipynb` (game-level dynamics), point `RUN_DIR` at your run, and run all cells.
 
+### **Kaggle Benchmarks (Optional)**
+
+Install with `uv sync --extra kaggle`. The Kaggle integration keeps the same
+Avalon engine, private observations, and cross-game memory while using Kaggle's
+Model Proxy. It includes a low-cost random-opponent pilot, fixed-model roster
+Tasks, explicit call limits, and resumable game-boundary checkpoints.
+
+See [the Kaggle guide](docs/kaggle.md) for authentication, testing, deployment,
+and scoring protocols. The integration never falls back to personal provider
+API keys. Hosted execution still requires Kaggle account access, available quota,
+and a compatible Python runtime.
+
 
 ## **Features**
 

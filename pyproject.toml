@@ -26,12 +26,16 @@ license-files = ["LICEN[CS]E*", "NOTICE*"]
 keywords = ["llm-agents", "multi-agent", "game-playing", "social-deduction", "avalon", "deception", "llm-evaluation", "langgraph", "pydantic-ai"]
 
 [dependency-groups]
+test = ["pytest>=8.3,<10"]
 dev = [
   "ipykernel>=7.3.0",
   "matplotlib>=3.11.1",
   "pandas>=3.0.5",
   "ruff>=0.16.5",
 ]
+
+[project.optional-dependencies]
+kaggle = ["kaggle-benchmarks==0.6.1"]
 
 [project.urls]
 Repository = "https://github.com/LuoZihYuan/camelot-bench"
